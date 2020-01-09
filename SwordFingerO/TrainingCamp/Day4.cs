@@ -6,8 +6,8 @@ namespace SwordFingerO.TrainingCamp
 {
     public class Day4
     {
-        public int Trap(int[] height)
-        {
-        }
+        // public int Trap(int[] height)
+        // {
+        // }
     }
 }
