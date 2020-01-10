@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Threading;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,5 +10,6 @@ namespace SwordFingerO.TrainingCamp
         // public int Trap(int[] height)
         // {
         // }
+        //ThreadStart
     }
 }
