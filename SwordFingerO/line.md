@@ -167,5 +167,49 @@ Q： 写一个二分查找的变体算法，查找递增数组中第一个大于
   执行器
     开始执行前 先判断一下对表是否有权限
     慢查询日志 row_examined 表示扫描了多少行
+
+70. 日志系统：一条SQL更新语句是如何执行的？
+  更新流程     redo log && binlog
+    **redo log   存储引擎层  InnoDB特有   物理页变更信息日志
+    WAL   --  Write-Ahead Logging 先写日志 再写磁盘
+    write pos && checkpoint
+    crash-safe
+    **binlog      Server层    SQL语句信息 逻辑修改日志
+    binlog没有被用来做崩溃恢复
+    历史原因 + 操作上binlog可以被关闭   ->set sql_log_bin=0
+  两阶段提交
     
-    
+    为该讲的内容总结了几个问题, 大家复习的时候可以先尝试回答这些问题检查自己的掌握程度:
+   1. redo log的概念是什么? 为什么会存在.
+   2. 什么是WAL(write-ahead log)机制, 好处是什么.
+   3. redo log 为什么可以保证crash safe机制.
+   4. binlog的概念是什么, 起到什么作用, 可以做crash safe吗?
+   5. binlog和redolog的不同点有哪些?
+   6. 物理一致性和逻辑一直性各应该怎么理解?
+   7. 执行器和innoDB在执行update语句时候的流程是什么样的?
+   8. 如果数据库误操作, 如何执行数据恢复?
+   9. 什么是两阶段提交, 为什么需要两阶段提交, 两阶段提交怎么保证数据库中两份日志间的逻辑一致性(什么叫逻辑一致性)?
+  10. 如果不是两阶段提交, 先写redo log和先写bin log两种情况各会遇到什么问题?
+
+71. 2020/1/22 实战一(下)：手把手带你将ID生成器代码从"能用"重构为"好用"
+  代码重构可以分为四轮
+  1. 提高代码的可读性
+  2. 提高代码的可测试性
+  3. 编写完善的单元测试
+  4. 所有重构完成之后添加注释
+
+72. 2020/1/23 事务隔离：为什么你改了我还看不见？
+  事务支持是在引擎层实现的，而且并不是所有引擎支持事务，MyISAM就不支持
+  #隔离性与隔离级别
+  ACID(Atomicity,Consistency,Isolation,Durability)
+  隔离性  --多个事务同时执行时 可能出现脏读(dirty-read) 不可重复读(non-repeatable read) 幻读(phantom read)等问题
+  SQL事务隔离级别包括：读未提交(read uncommitted) 读提交(read committed) 可重复读(repeatable read) 串行化(serializable)
+  实现上，数据库里创建一个视图，访问的时候以视图的逻辑结果为准。
+  [可重复读]的视图在事务启动时创建，整个事务存在期间都用这个视图
+  [读提交]在每个SQL语句开始执行的时候创建
+  [读未提交]直接返回记录上的最新值 没有视图概念
+  [串行化]直接用加锁的方式来避免并行访问
+  Oracle 默认隔离级别是读提交 Mysql 可重复读
+  show variables like 'transaction_isolation';
+  查询长事务
+  select * from information_schema.innodb_trx where TIME_TO_SEC(timediff(now(),trx_started))>60
